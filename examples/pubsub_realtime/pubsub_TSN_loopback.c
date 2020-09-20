@@ -72,7 +72,7 @@ UA_DataSetReaderConfig readerConfig;
 #if defined(PUBLISHER)
 #define             PUBLISHER_ID                          2235
 #define             WRITER_GROUP_ID                       100
-#define             DATA_SET_WRITER_ID                    62541
+#define             DATA_SET_WRITER_ID                     62541
 #define             PUBLISHING_MAC_ADDRESS                "opc.eth://01-00-5E-00-00-01"
 #endif
 #if defined(SUBSCRIBER)
