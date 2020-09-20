@@ -51,6 +51,8 @@ const UA_Byte DS_MH_SHIFT_LEN = 1;
 static UA_Boolean UA_NetworkMessage_ExtendedFlags1Enabled(const UA_NetworkMessage* src);
 static UA_Boolean UA_NetworkMessage_ExtendedFlags2Enabled(const UA_NetworkMessage* src);
 static UA_Boolean UA_DataSetMessageHeader_DataSetFlags2Enabled(const UA_DataSetMessageHeader* src);
+UA_Variant yxh;
+
 
 UA_StatusCode
 UA_NetworkMessage_updateBufferedMessage(UA_NetworkMessageOffsetBuffer *buffer){
@@ -131,10 +133,80 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
         case UA_PUBSUB_OFFSETTYPE_PAYLOAD_VARIANT:
             rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+            printf("a1: %f\n",*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
             payloadCounter++;
+
+            UA_Variant_init(&yxh);
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &yxh);
+         //   printf("a2: %f\n",*(UA_Double *)yxh.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+
+                 UA_Variant_init(&yxh);
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &yxh);
+          //  printf("a3: %ld\n",*(UA_UInt64*)yxh.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+
+                 UA_Variant_init(&yxh);
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &yxh);
+        //    printf("a4: %d\n",*(UA_Boolean *)yxh.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+
+                 UA_Variant_init(&yxh);
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &yxh);
+          //  printf("a5: %d\n",*(UA_Boolean *)yxh.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+                 UA_Variant_init(&yxh);
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &yxh);
+        //    printf("a6: %d\n",*(UA_Boolean *)yxh.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+                 UA_Variant_init(&yxh);
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &yxh);
+        //    printf("a7: %d\n",*(UA_Boolean *)yxh.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+                 UA_Variant_init(&yxh);
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &yxh);
+        //    printf("a8: %d\n",*(UA_Boolean *)yxh.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+           /* rv = UA_Variant_decodeBinary(src, &offset,
+                                         &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+            printf("a2: %f\n",*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+            dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
+            payloadCounter++;
+
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+            printf("a3: %ld\n",*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+            dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
+            payloadCounter++;
+
+            rv = UA_Variant_decodeBinary(src, &offset,
+                                         &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+            printf("a4: %d\n",*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+            dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
+            payloadCounter++;*/
             break;
         default:
             return UA_STATUSCODE_BADNOTSUPPORTED;
