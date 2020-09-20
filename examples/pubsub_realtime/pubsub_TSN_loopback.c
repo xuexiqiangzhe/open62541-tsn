@@ -81,7 +81,7 @@ UA_DataSetReaderConfig readerConfig;
 #define             DATA_SET_WRITER_ID_SUB               62541
 #define             SUBSCRIBING_MAC_ADDRESS              "opc.eth://01-00-5E-7F-00-01"
 #endif
-#define             REPEATED_NODECOUNTS                 0//YXHGL
+#define             REPEATED_NODECOUNTS               7//YXHGL
 #define             PORT_NUMBER                           62541
 #define             RECEIVE_QUEUE                         2
 #define             XDP_FLAG                              XDP_FLAGS_SKB_MODE

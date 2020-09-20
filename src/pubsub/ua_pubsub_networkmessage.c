@@ -86,8 +86,24 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
     UA_StatusCode rv = UA_STATUSCODE_GOOD;
     size_t payloadCounter = 0;
     UA_DataSetMessage* dsm = buffer->nm->payload.dataSetPayload.dataSetMessages; // Considering one DSM in RT TODO: Clarify multiple DSM
-    for (size_t i = 0; i < buffer->offsetsSize; ++i) {
-        size_t offset = buffer->offsets[i].offset;
+    
+   // for (size_t i = 0; i < buffer->offsetsSize; ++i) {
+       for (size_t i = 0; i < 4; ++i) {//YXHGL
+         size_t offset = buffer->offsets[i].offset;
+    /*    printf("sieze:%ld\t,offsetchushi%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\n,"
+        ,buffer->offsetsSize
+        ,buffer->offsets[0].offset
+        ,buffer->offsets[1].offset
+        ,buffer->offsets[2].offset
+        ,buffer->offsets[3].offset
+        ,buffer->offsets[4].offset
+        ,buffer->offsets[5].offset
+        ,buffer->offsets[6].offset
+        ,buffer->offsets[7].offset
+         ,buffer->offsets[8].offset
+          ,buffer->offsets[9].offset
+     ,buffer->offsets[10].offset
+        );*/
         switch (buffer->offsets[i].contentType) {
         case UA_PUBSUB_OFFSETTYPE_PUBLISHERID:
             switch (buffer->nm->publisherIdType) {
@@ -131,15 +147,18 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
             payloadCounter++;
             break;
         case UA_PUBSUB_OFFSETTYPE_PAYLOAD_VARIANT:
+      /* if(offset!=30) {
+           offset=30;}*/
+        //      printf("offsetchushi%ld\n,",offset);
             rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-            printf("a1: %f\n",*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+           printf("%ld\t,a1: %f\n",offset,*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
             payloadCounter++;
 
-            UA_Variant_init(&yxh);
+        /*    UA_Variant_init(&yxh);
             rv = UA_Variant_decodeBinary(src, &offset,
                                          &yxh);
          //   printf("a2: %f\n",*(UA_Double *)yxh.data);
@@ -183,30 +202,72 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
                                          &yxh);
         //    printf("a8: %d\n",*(UA_Boolean *)yxh.data);
             if(rv != UA_STATUSCODE_GOOD)
-                return rv;
-           /* rv = UA_Variant_decodeBinary(src, &offset,
+                return rv;*/
+/**(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[0].value.data=10;
+*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[1].value.data=11;
+*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[2].value.data=12;
+*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[3].value.data=13;
+*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[4].value.data=14;
+*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[5].value.data=15;
+*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[6].value.data=16;
+*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[7].value.data=17;*/
+
+
+            rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-            printf("a2: %f\n",*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            printf("%ld\t,a2: %f\n",offset,*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
             payloadCounter++;
 
-            rv = UA_Variant_decodeBinary(src, &offset,
+         rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-            printf("a3: %ld\n",*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            printf("%ld\t,a3: %ld\n",offset,*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
             payloadCounter++;
 
-            rv = UA_Variant_decodeBinary(src, &offset,
+        rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-            printf("a4: %d\n",*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            printf("%ld\t,a4: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
-            payloadCounter++;*/
+            payloadCounter++;
+
+ rv = UA_Variant_decodeBinary(src, &offset,
+                                         &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+         printf("%ld\t,a5: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+            dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
+            payloadCounter++;
+
+ rv = UA_Variant_decodeBinary(src, &offset,
+                                         &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+            printf("%ld\t,a6: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+            dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
+            payloadCounter++;
+
+ rv = UA_Variant_decodeBinary(src, &offset,
+                                         &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+             printf("%ld\t,a7: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+            dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
+            payloadCounter++;
+
+ rv = UA_Variant_decodeBinary(src, &offset,
+                                         &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+           printf("%ld\t,a8: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+            dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
+            payloadCounter++;
             break;
         default:
             return UA_STATUSCODE_BADNOTSUPPORTED;

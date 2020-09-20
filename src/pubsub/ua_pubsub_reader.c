@@ -56,6 +56,17 @@ UA_PubSubDataSetReader_generateKeyFrameMessage(UA_Server *server,
     if(!dataSetMessage->data.keyFrameData.dataSetFields)
         return UA_STATUSCODE_BADOUTOFMEMORY;
 
+printf("%d\t,%d\t,%d\t,%d\t,%d\t,%d\t,%d\t,%d\t,%d\n"
+,dataSetMessage->data.keyFrameData.dataSetFields[0].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[1].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[2].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[3].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[4].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[5].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[6].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[7].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[8].hasValue
+);
      for(size_t counter = 0; counter < dataSetReader->subscribedDataSetTarget.targetVariablesSize; counter++) {
         /* Sample the value */
         UA_DataValue *dfv = &dataSetMessage->data.keyFrameData.dataSetFields[counter];
@@ -80,7 +91,34 @@ UA_PubSubDataSetReader_generateKeyFrameMessage(UA_Server *server,
             (u64)UA_DATASETFIELDCONTENTMASK_SERVERPICOSECONDS) == 0)
             dfv->hasServerPicoseconds = false;
     }
-
+    /*
+*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[0].value.data=0;
+*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[1].value.data=1;
+*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[2].value.data=2;
+*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[3].value.data=3;
+*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[4].value.data=4;
+*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[5].value.data=5;
+*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[6].value.data=6;
+*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[7].value.data=7;
+printf("%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\t,%ld\n,%d\t,%d\t,%d\t,%d\t,%d\t,%d\t,%d\t,%d\t,%d\n"
+,*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[0].value.data
+,*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[1].value.data
+,*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[2].value.data
+,*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[3].value.data
+,*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[4].value.data
+,*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[5].value.data
+,*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[6].value.data
+,*(UA_UInt64 *)dataSetMessage->data.keyFrameData.dataSetFields[7].value.data
+,dataSetMessage->data.keyFrameData.dataSetFields[0].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[1].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[2].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[3].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[4].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[5].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[6].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[7].hasValue
+,dataSetMessage->data.keyFrameData.dataSetFields[8].hasValue
+);*/
     return UA_STATUSCODE_GOOD;
 }
 
