@@ -268,6 +268,15 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
             payloadCounter++;
+
+     rv = UA_Variant_decodeBinary(src, &offset,
+                                         &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
+      //     printf("%ld\t,a9: %d\n",offset,*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+            if(rv != UA_STATUSCODE_GOOD)
+                return rv;
+            dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
+            payloadCounter++;
+
             break;
         default:
             return UA_STATUSCODE_BADNOTSUPPORTED;

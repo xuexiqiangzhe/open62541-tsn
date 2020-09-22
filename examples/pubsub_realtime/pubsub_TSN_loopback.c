@@ -60,7 +60,7 @@ UA_DataSetReaderConfig readerConfig;
 /* Configurable Parameters */
 /* These defines enables the publisher and subscriber of the OPCUA stack */
 /* To run only publisher, enable PUBLISHER define alone (comment SUBSCRIBER) */
-//#define             PUBLISHER
+#define             PUBLISHER
 /* To run only subscriber, enable SUBSCRIBER define alone (comment PUBLISHER) */
 #define             SUBSCRIBER
 #define             UPDATE_MEASUREMENTS
@@ -81,7 +81,7 @@ UA_DataSetReaderConfig readerConfig;
 #define             DATA_SET_WRITER_ID_SUB               62541
 #define             SUBSCRIBING_MAC_ADDRESS              "opc.eth://01-00-5E-7F-00-01"
 #endif
-#define             REPEATED_NODECOUNTS               7//YXHGL
+#define             REPEATED_NODECOUNTS              8//YXHGL
 #define             PORT_NUMBER                           62541
 #define             RECEIVE_QUEUE                         2
 #define             XDP_FLAG                              XDP_FLAGS_SKB_MODE
@@ -147,6 +147,7 @@ UA_NodeId stopcurrentlyNode;
 UA_NodeId resetNode;
 UA_NodeId backtozeroNode;
 UA_NodeId moveNode ;
+UA_NodeId countNode ;
 #if defined(PUBLISHER)
 #if defined(UPDATE_MEASUREMENTS)
 /* File to store the data and timestamps for different traffic */
@@ -211,7 +212,7 @@ void *publisherETF(void *arg);
 /* Subscriber thread routine */
 void *subscriber(void *arg);
 /* User application thread routine */
-//void *userApplicationPubSub(void *arg);
+void *userApplicationPubSub(void *arg);
 /* For adding nodes in the server information model */
 //static void addServerNodes(UA_Server *server);
 /* For deleting the nodes created */
@@ -395,6 +396,10 @@ static void addSubscribedVariables (UA_Server *server, UA_NodeId dataSetReaderId
 
             case 7:
             targetVars.targetVariables[iterator].targetNodeId = moveNode;
+            break;
+
+             case 8:
+            targetVars.targetVariables[iterator].targetNodeId = countNode;
             break;
         }
            printf("%d\t,Target Node ID:%d\n",iterator, targetVars.targetVariables[iterator].targetNodeId.identifier.numeric);
@@ -746,7 +751,7 @@ void *subscriber(void *arg) {
  * **UserApplication thread routine**
  *
  */
-/*void *userApplicationPubSub(void *arg) {
+void *userApplicationPubSub(void *arg) {
     UA_Server* server;
     struct timespec nextnanosleeptimeUserApplication;
    
@@ -761,23 +766,18 @@ void *subscriber(void *arg) {
         clock_nanosleep(CLOCKID, TIMER_ABSTIME, &nextnanosleeptimeUserApplication, NULL);
 #if defined(SUBSCRIBER)
        // const UA_NodeId nodeid = UA_NODEID_STRING(1, "SubscriberCounter");
-      //  UA_Variant subCounter;
-       // UA_Variant_init(&subCounter);
-        //UA_Server_readValue(server, nodeid, &subCounter);
+        UA_Variant subCounter;
+       UA_Variant_init(&subCounter);
+        UA_Server_readValue(server, countNode, &subCounter);
         clock_gettime(CLOCKID, &dataReceiveTime);
-        subCounterData = 410;
-    //    UA_Variant_clear(&subCounter);
-        for (UA_Int32 iterator = 0; iterator <  REPEATED_NODECOUNTS; iterator++)
-        {
-            UA_Variant_init(&subCounter);
-            UA_Server_readValue(server, UA_NODEID_NUMERIC(1, (UA_UInt32)iterator+50000), &subCounter);
-            *repeatedCounterData[iterator] = *(UA_UInt64 *)subCounter.data;
-            UA_Variant_clear(&subCounter);
-        }
+        subCounterData = *(UA_UInt64*)subCounter.data;
+      
+    UA_Variant_clear(&subCounter);
 #endif
 #if defined(PUBLISHER)
         clock_gettime(CLOCKID, &dataModificationTime);
         *pubCounterData = subCounterData;
+    
 #ifndef PUBSUB_CONFIG_FASTPATH_FIXED_OFFSETS
         UA_Variant pubCounter;
         UA_Variant_init(&pubCounter);
@@ -812,7 +812,7 @@ void *subscriber(void *arg) {
 #endif
 
     return (void*)NULL;
-}*/
+}
 #endif
 
 /**
@@ -845,6 +845,7 @@ static void removeServerNodes(UA_Server *server) {
          UA_Server_deleteNode(server,settingTSNNode, UA_TRUE);
         UA_Server_deleteNode(server, numberNode, UA_TRUE);
          UA_Server_deleteNode(server, RefrigerationId, UA_TRUE);
+         UA_Server_deleteNode(server, countNode, UA_TRUE);
         UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3910), UA_TRUE);
         UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3911), UA_TRUE);
          UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3912), UA_TRUE);
@@ -865,7 +866,7 @@ static void removeServerNodes(UA_Server *server) {
         UA_NodeId_clear(&statusNode);
          UA_NodeId_clear(&settingTSNNode);
         UA_NodeId_clear(&numberNode);
-    
+        UA_NodeId_clear(&countNode);
 
 
   /*  for (UA_Int32 iterator = 0; iterator < REPEATED_NODECOUNTS; iterator++)//YXHGL
@@ -1102,6 +1103,16 @@ DefineeDevice(UA_Server *server) {
                               UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                               UA_QUALIFIEDNAME(1, "Move"),
                               UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), moveAttr, NULL, NULL);
+
+    UA_VariableAttributes countAttr = UA_VariableAttributes_default;
+    UA_UInt64 countvalue = 0;
+    UA_Variant_setScalar(&countAttr.value, &countvalue, &UA_TYPES[UA_TYPES_UINT64]);
+    countAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    countAttr.displayName = UA_LOCALIZEDTEXT("en-US", "Countdata");
+    UA_Server_addVariableNode(server, countNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Count"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), countAttr, NULL, NULL);
 
 }
 
@@ -1432,11 +1443,12 @@ stopcurrentlyNode = UA_NODEID_NUMERIC(1, 40003);
 resetNode = UA_NODEID_NUMERIC(1,  40004);
 backtozeroNode =  UA_NODEID_NUMERIC(1,  40005);
 moveNode =  UA_NODEID_NUMERIC(1,  40006);
+countNode =UA_NODEID_NUMERIC(1,  40007);
     UA_Int32         returnValue         = 0;
     UA_StatusCode    retval              = UA_STATUSCODE_GOOD;
     UA_Server       *server              = UA_Server_new();
     UA_ServerConfig *config              = UA_Server_getConfig(server);
-//    pthread_t        userThreadID;
+   pthread_t        userThreadID;
     UA_ServerConfig_setMinimal(config, PORT_NUMBER, NULL);
 
 #if defined(PUBLISHER)
@@ -1561,8 +1573,8 @@ UA_NetworkAddressUrlDataType networkAddressUrlSub;
     serverConfig                = (serverConfigStruct*)UA_malloc(sizeof(serverConfigStruct));
     serverConfig->ServerRun     = server;
 #if defined(PUBLISHER) || defined(SUBSCRIBER)
-   // char threadNameUserAppl[22] = "UserApplicationPubSub";
-    //userThreadID                = threadCreation(USERAPPLICATION_SCHED_PRIORITY, CORE_THREE, userApplicationPubSub, threadNameUserAppl, serverConfig);
+    char threadNameUserAppl[22] = "UserApplicationPubSub";
+    userThreadID                = threadCreation(USERAPPLICATION_SCHED_PRIORITY, CORE_THREE, userApplicationPubSub, threadNameUserAppl, serverConfig);
 #endif
     retval |= UA_Server_run(server, &running);
 
@@ -1580,10 +1592,10 @@ UA_NetworkAddressUrlDataType networkAddressUrlSub;
     }
 #endif
 #if defined(PUBLISHER) || defined(SUBSCRIBER)
-   /* returnValue = pthread_join(userThreadID, NULL);
+    returnValue = pthread_join(userThreadID, NULL);
     if (returnValue != 0) {
         UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,"\nPthread Join Failed for User thread:%d\n", returnValue);
-    }*/
+    }
 #endif
 
 #if defined(PUBLISHER)
