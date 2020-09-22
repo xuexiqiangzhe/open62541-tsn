@@ -60,7 +60,7 @@ UA_DataSetReaderConfig readerConfig;
 /* Configurable Parameters */
 /* These defines enables the publisher and subscriber of the OPCUA stack */
 /* To run only publisher, enable PUBLISHER define alone (comment SUBSCRIBER) */
-#define             PUBLISHER
+//#define             PUBLISHER
 /* To run only subscriber, enable SUBSCRIBER define alone (comment PUBLISHER) */
 #define             SUBSCRIBER
 #define             UPDATE_MEASUREMENTS
@@ -126,16 +126,27 @@ UA_NodeId           connectionIdent;
 UA_NodeId           publishedDataSetIdent;
 UA_NodeId           writerGroupIdent;
 UA_NodeId           pubNodeID;
-UA_NodeId           subNodeID;
+//UA_NodeId           subNodeID;//YXHGL
 UA_NodeId           pubRepeatedCountNodeID;
-UA_NodeId           subRepeatedCountNodeID;
+//UA_NodeId           subRepeatedCountNodeID;//YXHGL
 /* Variables for counter data handling in address space */
 UA_UInt64           *pubCounterData;
 UA_UInt64           *repeatedCounterData[REPEATED_NODECOUNTS];
 UA_DataValue        *staticValueSource;
 
 UA_UInt64           subCounterData         = 0;
-
+/*信息模型*/
+UA_NodeId RefrigerationId; 
+UA_NodeId numberNode ;
+UA_NodeId rtpostionNode ;
+UA_NodeId settingTSNNode ;
+UA_NodeId CycletimeTSNNode;
+UA_NodeId QbvTSNNode ;
+UA_NodeId statusNode;
+UA_NodeId stopcurrentlyNode;
+UA_NodeId resetNode;
+UA_NodeId backtozeroNode;
+UA_NodeId moveNode ;
 #if defined(PUBLISHER)
 #if defined(UPDATE_MEASUREMENTS)
 /* File to store the data and timestamps for different traffic */
@@ -200,9 +211,9 @@ void *publisherETF(void *arg);
 /* Subscriber thread routine */
 void *subscriber(void *arg);
 /* User application thread routine */
-void *userApplicationPubSub(void *arg);
+//void *userApplicationPubSub(void *arg);
 /* For adding nodes in the server information model */
-static void addServerNodes(UA_Server *server);
+//static void addServerNodes(UA_Server *server);
 /* For deleting the nodes created */
 static void removeServerNodes(UA_Server *server);
 /* To create multi-threads */
@@ -348,16 +359,51 @@ static void addSubscribedVariables (UA_Server *server, UA_NodeId dataSetReaderId
                                       UA_calloc(targetVars.targetVariablesSize,
                                       sizeof(UA_FieldTargetDataType));
     /* For creating Targetvariable */
-    for (iterator = 0; iterator < REPEATED_NODECOUNTS; iterator++)
+    for (iterator = 0; iterator < REPEATED_NODECOUNTS+1; iterator++)
     {
         UA_FieldTargetDataType_init(&targetVars.targetVariables[iterator]);
         targetVars.targetVariables[iterator].attributeId  = UA_ATTRIBUTEID_VALUE;
-        targetVars.targetVariables[iterator].targetNodeId = UA_NODEID_NUMERIC(1, (UA_UInt32)iterator + 50000);
+        switch (iterator)//YXHGL
+        {
+        case 0:
+        targetVars.targetVariables[iterator].targetNodeId = rtpostionNode;
+            break;
+
+        case 1:
+            targetVars.targetVariables[iterator].targetNodeId = CycletimeTSNNode;
+            break;
+
+            case 2:
+            targetVars.targetVariables[iterator].targetNodeId = QbvTSNNode;
+            break;
+
+            case 3:
+             targetVars.targetVariables[iterator].targetNodeId = statusNode;
+            break;
+
+            case 4:
+           targetVars.targetVariables[iterator].targetNodeId = stopcurrentlyNode;
+            break;
+
+            case 5:
+             targetVars.targetVariables[iterator].targetNodeId = resetNode;
+            break;
+
+            case 6:
+            targetVars.targetVariables[iterator].targetNodeId = backtozeroNode;
+            break;
+
+            case 7:
+            targetVars.targetVariables[iterator].targetNodeId = moveNode;
+            break;
+        }
+           printf("%d\t,Target Node ID:%d\n",iterator, targetVars.targetVariables[iterator].targetNodeId.identifier.numeric);
+
     }
 
-    UA_FieldTargetDataType_init(&targetVars.targetVariables[iterator]);
+    /*UA_FieldTargetDataType_init(&targetVars.targetVariables[iterator]);
     targetVars.targetVariables[iterator].attributeId  = UA_ATTRIBUTEID_VALUE;
-    targetVars.targetVariables[iterator].targetNodeId = subNodeID;
+    targetVars.targetVariables[iterator].targetNodeId = subNodeID;*/
     UA_Server_DataSetReader_createTargetVariables(server, dataSetReaderId, &targetVars);
 
     UA_TargetVariablesDataType_clear(&targetVars);
@@ -700,12 +746,12 @@ void *subscriber(void *arg) {
  * **UserApplication thread routine**
  *
  */
-void *userApplicationPubSub(void *arg) {
+/*void *userApplicationPubSub(void *arg) {
     UA_Server* server;
     struct timespec nextnanosleeptimeUserApplication;
-    /* Get current time and compute the next nanosleeptime */
+   
     clock_gettime(CLOCKID, &nextnanosleeptimeUserApplication);
-    /* Variable to nano Sleep until 1ms before a 1 second boundary */
+   
     nextnanosleeptimeUserApplication.tv_sec                      += SECONDS_SLEEP;
     nextnanosleeptimeUserApplication.tv_nsec                      = NANO_SECONDS_SLEEP_USER_APPLICATION;
     nanoSecondFieldConversion(&nextnanosleeptimeUserApplication);
@@ -714,13 +760,13 @@ void *userApplicationPubSub(void *arg) {
     while (running) {
         clock_nanosleep(CLOCKID, TIMER_ABSTIME, &nextnanosleeptimeUserApplication, NULL);
 #if defined(SUBSCRIBER)
-        const UA_NodeId nodeid = UA_NODEID_STRING(1, "SubscriberCounter");
-        UA_Variant subCounter;
-        UA_Variant_init(&subCounter);
-        UA_Server_readValue(server, nodeid, &subCounter);
+       // const UA_NodeId nodeid = UA_NODEID_STRING(1, "SubscriberCounter");
+      //  UA_Variant subCounter;
+       // UA_Variant_init(&subCounter);
+        //UA_Server_readValue(server, nodeid, &subCounter);
         clock_gettime(CLOCKID, &dataReceiveTime);
-        subCounterData = *(UA_UInt64 *)subCounter.data;
-        UA_Variant_clear(&subCounter);
+        subCounterData = 410;
+    //    UA_Variant_clear(&subCounter);
         for (UA_Int32 iterator = 0; iterator <  REPEATED_NODECOUNTS; iterator++)
         {
             UA_Variant_init(&subCounter);
@@ -766,7 +812,7 @@ void *userApplicationPubSub(void *arg) {
 #endif
 
     return (void*)NULL;
-}
+}*/
 #endif
 
 /**
@@ -787,11 +833,46 @@ static void removeServerNodes(UA_Server *server) {
     }
 #endif
 
-    for (UA_Int32 iterator = 0; iterator < REPEATED_NODECOUNTS; iterator++)
+    
+        UA_Server_deleteNode(server, rtpostionNode, UA_TRUE);
+        UA_Server_deleteNode(server, CycletimeTSNNode, UA_TRUE);
+        UA_Server_deleteNode(server, QbvTSNNode, UA_TRUE);
+        UA_Server_deleteNode(server, stopcurrentlyNode, UA_TRUE);
+        UA_Server_deleteNode(server, resetNode, UA_TRUE);
+        UA_Server_deleteNode(server, backtozeroNode, UA_TRUE);
+        UA_Server_deleteNode(server, moveNode, UA_TRUE);
+        UA_Server_deleteNode(server, statusNode, UA_TRUE);
+         UA_Server_deleteNode(server,settingTSNNode, UA_TRUE);
+        UA_Server_deleteNode(server, numberNode, UA_TRUE);
+         UA_Server_deleteNode(server, RefrigerationId, UA_TRUE);
+        UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3910), UA_TRUE);
+        UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3911), UA_TRUE);
+         UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3912), UA_TRUE);
+          UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3913), UA_TRUE);
+           UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3914), UA_TRUE);
+            UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3915), UA_TRUE);
+             UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3916), UA_TRUE);
+              UA_Server_deleteNode(server, UA_NODEID_NUMERIC(1, 3917), UA_TRUE);
+      
+         UA_NodeId_clear(&RefrigerationId);
+        UA_NodeId_clear(&rtpostionNode);
+        UA_NodeId_clear(&CycletimeTSNNode);
+        UA_NodeId_clear(&QbvTSNNode);
+        UA_NodeId_clear(&stopcurrentlyNode);
+        UA_NodeId_clear(&resetNode);
+        UA_NodeId_clear(&backtozeroNode);
+        UA_NodeId_clear(&moveNode);
+        UA_NodeId_clear(&statusNode);
+         UA_NodeId_clear(&settingTSNNode);
+        UA_NodeId_clear(&numberNode);
+    
+
+
+  /*  for (UA_Int32 iterator = 0; iterator < REPEATED_NODECOUNTS; iterator++)//YXHGL
     {
         UA_Server_deleteNode(server, subRepeatedCountNodeID, UA_TRUE);
         UA_NodeId_clear(&subRepeatedCountNodeID);
-    }
+    }*/
 }
 
 static pthread_t threadCreation(UA_Int16 threadPriority, size_t coreAffinity, void *(*thread) (void *), char *applicationName, \
@@ -838,7 +919,7 @@ static pthread_t threadCreation(UA_Int16 threadPriority, size_t coreAffinity, vo
  * The addServerNodes function is used to create the publisher and subscriber
  * nodes.
  */
-static void addServerNodes(UA_Server *server) {
+/*static void addServerNodes(UA_Server *server) {
     UA_NodeId objectId;
     UA_NodeId newNodeId;
     UA_ObjectAttributes object           = UA_ObjectAttributes_default;
@@ -887,7 +968,7 @@ static void addServerNodes(UA_Server *server) {
                                  UA_NODEID_NULL, repeatedNodePub, NULL, &pubRepeatedCountNodeID);
     }
 #endif
-
+//YXHGL
     for (UA_Int32 iterator = 0; iterator < REPEATED_NODECOUNTS; iterator++)
     {
         UA_VariableAttributes repeatedNodeSub = UA_VariableAttributes_default;
@@ -902,14 +983,436 @@ static void addServerNodes(UA_Server *server) {
                                   UA_NODEID_NULL, repeatedNodeSub, NULL, &subRepeatedCountNodeID);
     }
 
-}
+}*/
 
 static void
 usage(char *progname) {
     printf("usage: %s <ethernet_interface> \n", progname);
     printf("Provide the Interface parameter to run the application. Exiting \n");
 }
+/*信息模型*/
+static void
+DefineeDevice(UA_Server *server) {
+    
+    UA_ObjectAttributes oAttr = UA_ObjectAttributes_default;
+    oAttr.displayName = UA_LOCALIZEDTEXT("en-US", "电机设备");
+    UA_Server_addObjectNode(server, RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+                            UA_QUALIFIEDNAME(1, "Refrigeration equipment"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE),
+                            oAttr, NULL, &RefrigerationId);
 
+
+    UA_VariableAttributes nbAttr = UA_VariableAttributes_default;
+    UA_Int32 value = 01;
+    UA_Variant_setScalar(&nbAttr.value, &value, &UA_TYPES[UA_TYPES_INT32]);
+    nbAttr.displayName = UA_LOCALIZEDTEXT("en-US", "编号");
+    nbAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    UA_Server_addVariableNode(server, numberNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "number"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), nbAttr, NULL, NULL);
+
+    UA_VariableAttributes rttAttr = UA_VariableAttributes_default;
+    UA_Double rttvalue = 00.00;
+    UA_Variant_setScalar(&rttAttr.value, &rttvalue, &UA_TYPES[UA_TYPES_DOUBLE]);
+    rttAttr.displayName = UA_LOCALIZEDTEXT("en-US", "位置");
+    rttAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    UA_Server_addVariableNode(server, rtpostionNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Real time position"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), rttAttr, NULL, NULL);
+
+    UA_VariableAttributes stAttr = UA_VariableAttributes_default;
+    UA_String TSNvalue = UA_STRING("test");
+    UA_Variant_setScalar(&stAttr.value, &TSNvalue, &UA_TYPES[UA_TYPES_STRING]);
+    stAttr.displayName = UA_LOCALIZEDTEXT("en-US", "TSN配置");
+    stAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    UA_Server_addVariableNode(server, settingTSNNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Setting TSN"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), stAttr, NULL, NULL);
+
+    UA_VariableAttributes stAttr1 = UA_VariableAttributes_default;
+    UA_Double TSNvalue1 = 0.01;
+    UA_Variant_setScalar(&stAttr1.value, &TSNvalue1, &UA_TYPES[UA_TYPES_DOUBLE]);
+    stAttr1.displayName = UA_LOCALIZEDTEXT("en-US", "循环时间");
+    stAttr1.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    UA_Server_addVariableNode(server, CycletimeTSNNode, settingTSNNode,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Cycle Time"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), stAttr1, NULL, NULL);
+
+    UA_VariableAttributes stAttr2 = UA_VariableAttributes_default;
+    UA_Int16 TSNvalue2 = 100;
+    UA_Variant_setScalar(&stAttr2.value, &TSNvalue2, &UA_TYPES[UA_TYPES_INT16]);
+    stAttr2.displayName = UA_LOCALIZEDTEXT("en-US", "Qbv Offset");
+    stAttr2.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    UA_Server_addVariableNode(server, QbvTSNNode, settingTSNNode,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Qbv Offset"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), stAttr2, NULL, NULL);
+
+    UA_VariableAttributes statusAttr = UA_VariableAttributes_default;
+    UA_Boolean statusvalue = 0;
+    UA_Variant_setScalar(&statusAttr.value, &statusvalue, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    statusAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    statusAttr.displayName = UA_LOCALIZEDTEXT("en-US", "使能");
+    UA_Server_addVariableNode(server, statusNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Status"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), statusAttr, NULL, NULL);
+
+    UA_VariableAttributes stopcurrentlyAttr = UA_VariableAttributes_default;
+    UA_Boolean stopcurrentlyvalue = 0;
+    UA_Variant_setScalar(&stopcurrentlyAttr.value, &stopcurrentlyvalue, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    stopcurrentlyAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    stopcurrentlyAttr.displayName = UA_LOCALIZEDTEXT("en-US", "急停");
+    UA_Server_addVariableNode(server, stopcurrentlyNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Stopcurrently"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), stopcurrentlyAttr, NULL, NULL);
+
+    UA_VariableAttributes resetAttr = UA_VariableAttributes_default;
+    UA_Boolean resetvalue = 0;
+    UA_Variant_setScalar(&resetAttr.value, &resetvalue, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    resetAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    resetAttr.displayName = UA_LOCALIZEDTEXT("en-US", "复位");
+    UA_Server_addVariableNode(server, resetNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Reset"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), resetAttr, NULL, NULL);
+
+    UA_VariableAttributes backtozeroAttr = UA_VariableAttributes_default;
+    UA_Boolean backtozerovalue = 0;
+    UA_Variant_setScalar(&backtozeroAttr.value, &backtozerovalue, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    backtozeroAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    backtozeroAttr.displayName = UA_LOCALIZEDTEXT("en-US", "回零");
+    UA_Server_addVariableNode(server, backtozeroNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Backtozero"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), backtozeroAttr, NULL, NULL);
+
+    UA_VariableAttributes moveAttr = UA_VariableAttributes_default;
+    UA_Boolean movevalue = 0;
+    UA_Variant_setScalar(&moveAttr.value, &movevalue, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    moveAttr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+    moveAttr.displayName = UA_LOCALIZEDTEXT("en-US", "运动");
+    UA_Server_addVariableNode(server, moveNode, RefrigerationId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, "Move"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), moveAttr, NULL, NULL);
+
+}
+
+//方法回调和方法成对使用
+//设置循环时间
+static UA_StatusCode
+settingCycletimeTSNCallback(UA_Server *server,
+                         const UA_NodeId *sessionId, void *sessionHandle,
+                         const UA_NodeId *methodId, void *methodContext,
+                         const UA_NodeId *objectId, void *objectContext,
+                         size_t inputSize, const UA_Variant *input,
+                         size_t outputSize, UA_Variant *output) {
+
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Creating event");
+
+  
+    UA_Double tmp = *(UA_Double*)input->data;
+    UA_Variant myVar;
+    UA_Variant_init(&myVar);
+    UA_Variant_setScalar(&myVar, &tmp, &UA_TYPES[UA_TYPES_DOUBLE]);
+    UA_Server_writeValue(server, CycletimeTSNNode, myVar);
+
+    return UA_STATUSCODE_GOOD;
+}
+
+
+static void
+addsettingCycletimeTSNMethod(UA_Server *server) {
+
+    UA_Argument inputArgument;
+    UA_Argument_init(&inputArgument);
+    inputArgument.description = UA_LOCALIZEDTEXT("en-US", "A Double");
+    inputArgument.name = UA_STRING("MyInput");
+    inputArgument.dataType = UA_TYPES[UA_TYPES_DOUBLE].typeId;
+    inputArgument.valueRank = UA_VALUERANK_SCALAR;
+
+    UA_MethodAttributes generateAttr = UA_MethodAttributes_default;
+    generateAttr.description = UA_LOCALIZEDTEXT("en-US","Generate an event.");
+    generateAttr.displayName = UA_LOCALIZEDTEXT("en-US","设定循环时间入口");
+    generateAttr.executable = true;
+    generateAttr.userExecutable = true;
+    UA_Server_addMethodNode(server, UA_NODEID_NUMERIC(1, 3910),
+                            RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
+                            UA_QUALIFIEDNAME(1, "Generate Event"),
+                            generateAttr, &settingCycletimeTSNCallback,
+                            1, &inputArgument, 0, NULL, NULL, NULL);
+}
+
+//设置QBV Offeset
+static UA_StatusCode
+settingQBVTSNCallback(UA_Server *server,
+                         const UA_NodeId *sessionId, void *sessionHandle,
+                         const UA_NodeId *methodId, void *methodContext,
+                         const UA_NodeId *objectId, void *objectContext,
+                         size_t inputSize, const UA_Variant *input,
+                         size_t outputSize, UA_Variant *output) {
+
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Creating event");
+
+  
+    UA_Int16 tmp = *(UA_Int16*)input->data;
+    UA_Variant myVar;
+    UA_Variant_init(&myVar);
+    UA_Variant_setScalar(&myVar, &tmp, &UA_TYPES[UA_TYPES_INT16]);
+    UA_Server_writeValue(server, QbvTSNNode, myVar);
+
+    return UA_STATUSCODE_GOOD;
+}
+
+
+static void
+addsettingQBVTSNMethod(UA_Server *server) {
+    UA_Argument inputArgument;
+    UA_Argument_init(&inputArgument);
+    inputArgument.description = UA_LOCALIZEDTEXT("en-US", "A Int16");
+    inputArgument.name = UA_STRING("MyInput");
+    inputArgument.dataType = UA_TYPES[UA_TYPES_INT16].typeId;
+    inputArgument.valueRank = UA_VALUERANK_SCALAR;
+
+    UA_MethodAttributes generateAttr = UA_MethodAttributes_default;
+    generateAttr.description = UA_LOCALIZEDTEXT("en-US","Generate an event.");
+    generateAttr.displayName = UA_LOCALIZEDTEXT("en-US","设定QBV Offset入口");
+    generateAttr.executable = true;
+    generateAttr.userExecutable = true;
+    UA_Server_addMethodNode(server, UA_NODEID_NUMERIC(1, 3911),
+                            RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
+                            UA_QUALIFIEDNAME(1, "Generate Event"),
+                            generateAttr, &settingQBVTSNCallback,
+                            1, &inputArgument, 0, NULL, NULL, NULL);
+}
+
+
+//使能标致
+static UA_StatusCode
+shutdownCallback(UA_Server *server,
+                         const UA_NodeId *sessionId, void *sessionHandle,
+                         const UA_NodeId *methodId, void *methodContext,
+                         const UA_NodeId *objectId, void *objectContext,
+                         size_t inputSize, const UA_Variant *input,
+                         size_t outputSize, UA_Variant *output) {
+
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Creating event");
+
+   static UA_Boolean shutdownstatus = false;
+    UA_Variant myVar;
+    UA_Variant_init(&myVar);
+    UA_Variant_setScalar(&myVar, &shutdownstatus, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    UA_Server_writeValue(server, statusNode, myVar);
+
+    return UA_STATUSCODE_GOOD;
+}
+
+
+static void
+addsettingshutdownMethod(UA_Server *server) {
+    UA_MethodAttributes generateAttr = UA_MethodAttributes_default;
+    generateAttr.description = UA_LOCALIZEDTEXT("en-US","Generate an event.");
+    generateAttr.displayName = UA_LOCALIZEDTEXT("en-US","关闭");
+    generateAttr.executable = true;
+    generateAttr.userExecutable = true;
+    UA_Server_addMethodNode(server, UA_NODEID_NUMERIC(1, 3912),
+                            RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
+                            UA_QUALIFIEDNAME(1, "Generate Event"),
+                            generateAttr, &shutdownCallback,
+                            0, NULL, 0, NULL, NULL, NULL);
+}
+
+static UA_StatusCode
+setupCallback(UA_Server *server,
+                         const UA_NodeId *sessionId, void *sessionHandle,
+                         const UA_NodeId *methodId, void *methodContext,
+                         const UA_NodeId *objectId, void *objectContext,
+                         size_t inputSize, const UA_Variant *input,
+                         size_t outputSize, UA_Variant *output) {
+
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Creating event");
+
+   static UA_Boolean shutdownstatus = true;
+    UA_Variant myVar;
+    UA_Variant_init(&myVar);
+    UA_Variant_setScalar(&myVar, &shutdownstatus, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    UA_Server_writeValue(server, statusNode, myVar);
+
+    return UA_STATUSCODE_GOOD;
+}
+
+
+static void
+addsettingsetupMethod(UA_Server *server) {
+    UA_MethodAttributes generateAttr = UA_MethodAttributes_default;
+    generateAttr.description = UA_LOCALIZEDTEXT("en-US","Generate an event.");
+    generateAttr.displayName = UA_LOCALIZEDTEXT("en-US","启动");
+    generateAttr.executable = true;
+    generateAttr.userExecutable = true;
+    UA_Server_addMethodNode(server, UA_NODEID_NUMERIC(1, 3913),
+                            RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
+                            UA_QUALIFIEDNAME(1, "Generate Event"),
+                            generateAttr, &setupCallback,
+                            0, NULL, 0, NULL, NULL, NULL);
+}
+
+//急停方法
+static UA_StatusCode
+StopcurrentlyCallback(UA_Server *server,
+                         const UA_NodeId *sessionId, void *sessionHandle,
+                         const UA_NodeId *methodId, void *methodContext,
+                         const UA_NodeId *objectId, void *objectContext,
+                         size_t inputSize, const UA_Variant *input,
+                         size_t outputSize, UA_Variant *output) {
+
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Creating event");
+
+   static UA_Boolean shutdownstatus = true;
+    UA_Variant myVar;
+    UA_Variant_init(&myVar);
+    UA_Variant_setScalar(&myVar, &shutdownstatus, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    UA_Server_writeValue(server, stopcurrentlyNode, myVar);
+
+    return UA_STATUSCODE_GOOD;
+}
+
+
+static void
+addstopcurrentlyMethod(UA_Server *server) {
+    UA_MethodAttributes generateAttr = UA_MethodAttributes_default;
+    generateAttr.description = UA_LOCALIZEDTEXT("en-US","Generate an event.");
+    generateAttr.displayName = UA_LOCALIZEDTEXT("en-US","急停");
+    generateAttr.executable = true;
+    generateAttr.userExecutable = true;
+    UA_Server_addMethodNode(server, UA_NODEID_NUMERIC(1, 3914),
+                            RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
+                            UA_QUALIFIEDNAME(1, "Generate Event"),
+                            generateAttr, &StopcurrentlyCallback,
+                            0, NULL, 0, NULL, NULL, NULL);
+}
+
+
+
+//复位方法
+static UA_StatusCode
+ResetCallback(UA_Server *server,
+                         const UA_NodeId *sessionId, void *sessionHandle,
+                         const UA_NodeId *methodId, void *methodContext,
+                         const UA_NodeId *objectId, void *objectContext,
+                         size_t inputSize, const UA_Variant *input,
+                         size_t outputSize, UA_Variant *output) {
+
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Creating event");
+
+   static UA_Boolean shutdownstatus = true;
+    UA_Variant myVar;
+    UA_Variant_init(&myVar);
+    UA_Variant_setScalar(&myVar, &shutdownstatus, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    UA_Server_writeValue(server, resetNode, myVar);
+
+    return UA_STATUSCODE_GOOD;
+}
+
+
+static void
+addresetMethod(UA_Server *server) {
+    UA_MethodAttributes generateAttr = UA_MethodAttributes_default;
+    generateAttr.description = UA_LOCALIZEDTEXT("en-US","Generate an event.");
+    generateAttr.displayName = UA_LOCALIZEDTEXT("en-US","复位");
+    generateAttr.executable = true;
+    generateAttr.userExecutable = true;
+    UA_Server_addMethodNode(server, UA_NODEID_NUMERIC(1, 3915),
+                            RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
+                            UA_QUALIFIEDNAME(1, "Generate Event"),
+                            generateAttr, &ResetCallback,
+                            0, NULL, 0, NULL, NULL, NULL);
+}
+
+
+//回零方法
+static UA_StatusCode
+BacktozeroCallback(UA_Server *server,
+                         const UA_NodeId *sessionId, void *sessionHandle,
+                         const UA_NodeId *methodId, void *methodContext,
+                         const UA_NodeId *objectId, void *objectContext,
+                         size_t inputSize, const UA_Variant *input,
+                         size_t outputSize, UA_Variant *output) {
+
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Creating event");
+
+   static UA_Boolean shutdownstatus = true;
+    UA_Variant myVar;
+    UA_Variant_init(&myVar);
+    UA_Variant_setScalar(&myVar, &shutdownstatus, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    UA_Server_writeValue(server, backtozeroNode, myVar);
+
+    return UA_STATUSCODE_GOOD;
+}
+
+
+static void
+addbacktozeroMethod(UA_Server *server) {
+    UA_MethodAttributes generateAttr = UA_MethodAttributes_default;
+    generateAttr.description = UA_LOCALIZEDTEXT("en-US","Generate an event.");
+    generateAttr.displayName = UA_LOCALIZEDTEXT("en-US","回零");
+    generateAttr.executable = true;
+    generateAttr.userExecutable = true;
+    UA_Server_addMethodNode(server, UA_NODEID_NUMERIC(1, 3916),
+                            RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
+                            UA_QUALIFIEDNAME(1, "Generate Event"),
+                            generateAttr, &BacktozeroCallback,
+                            0, NULL, 0, NULL, NULL, NULL);
+}
+
+//运动方法
+static UA_StatusCode
+MoveCallback(UA_Server *server,
+                         const UA_NodeId *sessionId, void *sessionHandle,
+                         const UA_NodeId *methodId, void *methodContext,
+                         const UA_NodeId *objectId, void *objectContext,
+                         size_t inputSize, const UA_Variant *input,
+                         size_t outputSize, UA_Variant *output) {
+
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Creating event");
+
+   static UA_Boolean shutdownstatus = true;
+    UA_Variant myVar;
+    UA_Variant_init(&myVar);
+    UA_Variant_setScalar(&myVar, &shutdownstatus, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    UA_Server_writeValue(server, moveNode, myVar);
+
+    return UA_STATUSCODE_GOOD;
+}
+
+
+static void
+addmoveMethod(UA_Server *server) {
+    UA_MethodAttributes generateAttr = UA_MethodAttributes_default;
+    generateAttr.description = UA_LOCALIZEDTEXT("en-US","Generate an event.");
+    generateAttr.displayName = UA_LOCALIZEDTEXT("en-US","运动");
+    generateAttr.executable = true;
+    generateAttr.userExecutable = true;
+    UA_Server_addMethodNode(server, UA_NODEID_NUMERIC(1, 3917),
+                            RefrigerationId,
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
+                            UA_QUALIFIEDNAME(1, "Generate Event"),
+                            generateAttr, &MoveCallback,
+                            0, NULL, 0, NULL, NULL, NULL);
+}
 /**
  * **Main Server code**
  *
@@ -919,12 +1422,21 @@ usage(char *progname) {
 int main(int argc, char **argv) {
     signal(SIGINT, stopHandler);
     signal(SIGTERM, stopHandler);
-
+numberNode = UA_NODEID_NUMERIC(1, 39997);
+rtpostionNode = UA_NODEID_NUMERIC(1,  39998);
+settingTSNNode =  UA_NODEID_NUMERIC(1,  39999);
+CycletimeTSNNode = UA_NODEID_NUMERIC(1,  40000);
+QbvTSNNode =  UA_NODEID_NUMERIC(1,  40001);
+statusNode =  UA_NODEID_NUMERIC(1,  40002);
+stopcurrentlyNode = UA_NODEID_NUMERIC(1, 40003);
+resetNode = UA_NODEID_NUMERIC(1,  40004);
+backtozeroNode =  UA_NODEID_NUMERIC(1,  40005);
+moveNode =  UA_NODEID_NUMERIC(1,  40006);
     UA_Int32         returnValue         = 0;
     UA_StatusCode    retval              = UA_STATUSCODE_GOOD;
     UA_Server       *server              = UA_Server_new();
     UA_ServerConfig *config              = UA_Server_getConfig(server);
-    pthread_t        userThreadID;
+//    pthread_t        userThreadID;
     UA_ServerConfig_setMinimal(config, PORT_NUMBER, NULL);
 
 #if defined(PUBLISHER)
@@ -997,8 +1509,17 @@ UA_NetworkAddressUrlDataType networkAddressUrlSub;
 
     /* Server is the new OPCUA model which has both publisher and subscriber configuration */
     /* add axis node and OPCUA pubsub client server counter nodes */
-    addServerNodes(server);
-
+ //   addServerNodes(server);
+/*添加信息模型*/
+    DefineeDevice(server);
+    addsettingshutdownMethod(server);
+    addsettingsetupMethod(server);
+    addsettingCycletimeTSNMethod(server);
+    addsettingQBVTSNMethod(server);
+    addstopcurrentlyMethod(server);
+    addresetMethod(server);
+    addbacktozeroMethod(server);
+    addmoveMethod(server);
 #if defined(PUBLISHER)
     addPubSubConnection(server, &networkAddressUrlPub);
     addPublishedDataSet(server);
@@ -1040,8 +1561,8 @@ UA_NetworkAddressUrlDataType networkAddressUrlSub;
     serverConfig                = (serverConfigStruct*)UA_malloc(sizeof(serverConfigStruct));
     serverConfig->ServerRun     = server;
 #if defined(PUBLISHER) || defined(SUBSCRIBER)
-    char threadNameUserAppl[22] = "UserApplicationPubSub";
-    userThreadID                = threadCreation(USERAPPLICATION_SCHED_PRIORITY, CORE_THREE, userApplicationPubSub, threadNameUserAppl, serverConfig);
+   // char threadNameUserAppl[22] = "UserApplicationPubSub";
+    //userThreadID                = threadCreation(USERAPPLICATION_SCHED_PRIORITY, CORE_THREE, userApplicationPubSub, threadNameUserAppl, serverConfig);
 #endif
     retval |= UA_Server_run(server, &running);
 
@@ -1059,10 +1580,10 @@ UA_NetworkAddressUrlDataType networkAddressUrlSub;
     }
 #endif
 #if defined(PUBLISHER) || defined(SUBSCRIBER)
-    returnValue = pthread_join(userThreadID, NULL);
+   /* returnValue = pthread_join(userThreadID, NULL);
     if (returnValue != 0) {
         UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,"\nPthread Join Failed for User thread:%d\n", returnValue);
-    }
+    }*/
 #endif
 
 #if defined(PUBLISHER)

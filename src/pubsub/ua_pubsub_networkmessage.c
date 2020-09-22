@@ -152,7 +152,7 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
         //      printf("offsetchushi%ld\n,",offset);
             rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-           printf("%ld\t,a1: %f\n",offset,*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+         //  printf("%ld\t,a1: %f\n",offset,*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
@@ -215,7 +215,7 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
 
             rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-            printf("%ld\t,a2: %f\n",offset,*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+       //     printf("%ld\t,a2: %f\n",offset,*(UA_Double *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
@@ -223,7 +223,7 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
 
          rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-            printf("%ld\t,a3: %ld\n",offset,*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+         //   printf("%ld\t,a3: %ld\n",offset,*(UA_UInt64 *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
@@ -231,7 +231,7 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
 
         rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-            printf("%ld\t,a4: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+        //    printf("%ld\t,a4: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
@@ -239,7 +239,7 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
 
  rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-         printf("%ld\t,a5: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+   //      printf("%ld\t,a5: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
@@ -247,7 +247,7 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
 
  rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-            printf("%ld\t,a6: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+       //     printf("%ld\t,a6: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
@@ -255,7 +255,7 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
 
  rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-             printf("%ld\t,a7: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+       //      printf("%ld\t,a7: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
@@ -263,7 +263,7 @@ UA_NetworkMessage_updateBufferedNwMessage(UA_NetworkMessageOffsetBuffer *buffer,
 
  rv = UA_Variant_decodeBinary(src, &offset,
                                          &dsm->data.keyFrameData.dataSetFields[payloadCounter].value);
-           printf("%ld\t,a8: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
+      //     printf("%ld\t,a8: %d\n",offset,*(UA_Boolean *)dsm->data.keyFrameData.dataSetFields[payloadCounter].value.data);
             if(rv != UA_STATUSCODE_GOOD)
                 return rv;
             dsm->data.keyFrameData.dataSetFields[payloadCounter].hasValue = true;
