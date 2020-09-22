@@ -60,7 +60,7 @@ UA_DataSetReaderConfig readerConfig;
 /* Configurable Parameters */
 /* These defines enables the publisher and subscriber of the OPCUA stack */
 /* To run only publisher, enable PUBLISHER define alone (comment SUBSCRIBER) */
-#define             PUBLISHER
+//#define             PUBLISHER
 /* To run only subscriber, enable SUBSCRIBER define alone (comment PUBLISHER) */
 #define             SUBSCRIBER
 #define             UPDATE_MEASUREMENTS
@@ -751,7 +751,7 @@ void *subscriber(void *arg) {
  * **UserApplication thread routine**
  *
  */
-void *userApplicationPubSub(void *arg) {
+/*void *userApplicationPubSub(void *arg) {
     UA_Server* server;
     struct timespec nextnanosleeptimeUserApplication;
    
@@ -812,7 +812,7 @@ void *userApplicationPubSub(void *arg) {
 #endif
 
     return (void*)NULL;
-}
+}*/
 #endif
 
 /**
@@ -1573,8 +1573,8 @@ UA_NetworkAddressUrlDataType networkAddressUrlSub;
     serverConfig                = (serverConfigStruct*)UA_malloc(sizeof(serverConfigStruct));
     serverConfig->ServerRun     = server;
 #if defined(PUBLISHER) || defined(SUBSCRIBER)
-    char threadNameUserAppl[22] = "UserApplicationPubSub";
-    userThreadID                = threadCreation(USERAPPLICATION_SCHED_PRIORITY, CORE_THREE, userApplicationPubSub, threadNameUserAppl, serverConfig);
+ //   char threadNameUserAppl[22] = "UserApplicationPubSub";
+ //   userThreadID                = threadCreation(USERAPPLICATION_SCHED_PRIORITY, CORE_THREE, userApplicationPubSub, threadNameUserAppl, serverConfig);
 #endif
     retval |= UA_Server_run(server, &running);
 
