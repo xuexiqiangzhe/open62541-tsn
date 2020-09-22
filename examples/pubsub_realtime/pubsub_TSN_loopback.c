@@ -794,7 +794,7 @@ void *subscriber(void *arg) {
 #endif
 #endif
 #if defined(UPDATE_MEASUREMENTS)
-        if (subCounterData > 0)
+        if (subCounterData > 0) 
              updateMeasurementsSubscriber(dataReceiveTime, subCounterData);
         if (*pubCounterData > 0)
              updateMeasurementsPublisher(dataModificationTime, *pubCounterData);
