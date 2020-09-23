@@ -164,7 +164,7 @@ pthread_t           pubthreadID;
 struct timespec     dataModificationTime;
 #endif
 
-#if defined(SUBSCRIBER)
+#if defined(SUBSCRIBER) 
 #if defined(UPDATE_MEASUREMENTS)
 /* File to store the data and timestamps for different traffic */
 FILE               *fpSubscriber;
