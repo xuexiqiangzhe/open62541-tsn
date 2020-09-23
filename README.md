@@ -6,7 +6,7 @@ open62541 is licensed under the Mozilla Public License v2.0 (MPLv2). This allows
 
 The library is [available](https://github.com/open62541/open62541/releases) in standard source and binary form. In addition, the single-file source distribution merges the entire library into a single .c and .h file that can be easily added to existing projects. Example server and client implementations can be found in the [/examples](examples/) directory or further down on this page.
 
-## Project Information
+## Project Information 
 
 Build Status:
 
